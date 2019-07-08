@@ -27,6 +27,12 @@ app.get("/urls", function(req, res) {
   res.render("urls_index", templateVars);
 })
 
+app.get("/urls/:shortURL", function(req, res) {
+  let shortURL = req.params.shortURL;
+  let longURL = urlDatabase[req.params.shortURL];
+  res.render("urls_show", {longURL: longURL, shortURL: shortURL});
+})
+
 // Start the server
 const PORT = 8080; //default port 8080
 app.listen(PORT, () => {
