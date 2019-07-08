@@ -11,6 +11,10 @@ app.get("/", function(req, res) {
   res.send("Hello! This is the homepage!");
 });
 
+app.get("/urls.json", function(req, res) {
+  res.json(urlDatabase);
+})
+
 // Start the server
 const PORT = 8080; //default port 8080
 app.listen(PORT, () => {
