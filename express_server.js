@@ -8,7 +8,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 //set ejs as the view engine:
 app.set("view engine", "ejs");
 
-
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -36,11 +35,6 @@ app.get("/urls/new", function(req, res) {
   res.render("urls_new");
 })
 
-app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
-});
-
 //place this at the bottom so /urls/new will run:
 app.get("/urls/:shortURL", function(req, res) {
   let shortURL = req.params.shortURL;
@@ -48,8 +42,26 @@ app.get("/urls/:shortURL", function(req, res) {
   res.render("urls_show", {longURL: longURL, shortURL: shortURL});
 })
 
+app.post("/urls", (req, res) => {
+  // console.log(req.body);  // Log the POST request body to the console
+  // res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  const genshortURL = generateRandomString();
+  urlDatabase[genshortURL] = req.body.longURL;
+  res.redirect(`/urls/${genshortURL}`);
+});
+
 // Start the server
 const PORT = 8080; //default port 8080
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+//function returns a string of 6 alphanumeric characters
+function generateRandomString() {
+  var rString = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  var result = '';
+  for (var i = 0; i < 6; i++) {
+    result += rString[Math.floor(Math.random() * rString.length)]
+  }
+  return result;
+}
