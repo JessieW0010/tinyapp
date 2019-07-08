@@ -22,6 +22,11 @@ app.get("/hello", function(req, res) {
   res.send("<html><body><b>Hello</b> this is in HTML</body></html>");
 })
 
+app.get("/urls", function(req, res) {
+  let templateVars = {urls: urlDatabase};
+  res.render("urls_index", templateVars);
+})
+
 // Start the server
 const PORT = 8080; //default port 8080
 app.listen(PORT, () => {
