@@ -1,8 +1,13 @@
 const express = require("express");
 const app = express();  //initialize express
+const bodyParser = require("body-parser");
+
+//set bodyParser (this needs to come before all our GET routes)
+app.use(bodyParser.urlencoded({extended: true}));
 
 //set ejs as the view engine:
 app.set("view engine", "ejs");
+
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -27,6 +32,16 @@ app.get("/urls", function(req, res) {
   res.render("urls_index", templateVars);
 })
 
+app.get("/urls/new", function(req, res) {
+  res.render("urls_new");
+})
+
+app.post("/urls", (req, res) => {
+  console.log(req.body);  // Log the POST request body to the console
+  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+});
+
+//place this at the bottom so /urls/new will run:
 app.get("/urls/:shortURL", function(req, res) {
   let shortURL = req.params.shortURL;
   let longURL = urlDatabase[req.params.shortURL];
