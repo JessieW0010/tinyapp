@@ -50,6 +50,12 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${genshortURL}`);
 });
 
+//redirect to longURL link:
+app.get("/u/:shortURL", function(req, res) {
+  let shortURL = req.params.shortURL;
+  res.redirect(urlDatabase[shortURL]);
+})
+
 // Start the server
 const PORT = 8080; //default port 8080
 app.listen(PORT, () => {
