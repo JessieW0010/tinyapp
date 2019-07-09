@@ -1,6 +1,10 @@
 const express = require("express");
 const app = express();  //initialize express
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+
+//set cookies
+app.use(cookieParser());
 
 //set bodyParser (this needs to come before all our GET routes)
 app.use(bodyParser.urlencoded({extended: true}));
@@ -27,19 +31,20 @@ app.get("/hello", function(req, res) {
 })
 
 app.get("/urls", function(req, res) {
-  let templateVars = {urls: urlDatabase};
+  let templateVars = {urls: urlDatabase, username: req.cookies["username"]};
   res.render("urls_index", templateVars);
 })
 
 app.get("/urls/new", function(req, res) {
-  res.render("urls_new");
+  let username = {username: req.cookies["username"]}
+  res.render("urls_new", username);
 })
 
 //place this at the bottom so /urls/new will run:
 app.get("/urls/:shortURL", function(req, res) {
   let shortURL = req.params.shortURL;
   let longURL = urlDatabase[req.params.shortURL];
-  res.render("urls_show", {longURL: longURL, shortURL: shortURL});
+  res.render("urls_show", {longURL: longURL, shortURL: shortURL, username: req.cookies["username"]});
 })
 
 app.post("/urls", (req, res) => {
@@ -59,6 +64,18 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   let short = req.params.shortURL;
   console.log(short);
   delete urlDatabase[short];
+  res.redirect("/urls");
+})
+
+app.post("/login", function(req, res) {
+  // console.log(req.body.username);
+  res.cookie("username", req.body.username);
+  res.redirect("/urls");
+  console.log(req.cookies["username"]);
+})
+
+app.post("/logout", function(req, res) {
+  res.clearCookie("username", req.body.username);
   res.redirect("/urls");
 })
 

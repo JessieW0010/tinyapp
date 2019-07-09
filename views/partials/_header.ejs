@@ -1,13 +1,26 @@
 <header>
     <nav class="navbar navbar-expand-md navbar-dark bg-success">
-      <a class="navbar-brand" href="/urls">TinyApp</a>
+      <a class="navbar-brand" href="/urls" style="font-size: 30px; margin-bottom: 10px">TinyApp</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <a class="nav-item nav-link" href="/urls">My URLs</a>
-          <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+          <a class="nav-item nav-link" style="padding: 20px;" href="/urls">My URLs</a>
+          <a class="nav-item nav-link" style="padding: 20px;" href="/urls/new">Create New URL</a>
+          <% if (username) {%>
+            <form class="form-inline" style="margin-left: 750px" method="POST" action="/logout">
+              <!-- data in the input field will be available to us in the req.body.longURL variable stored in urlDatabase -->
+              <h5 style="position: inline" class="nav-item nav-link inline" href="/urls/new">Logged in as <%=username%></h5>
+              <button type="submit" class="btn btn-primary inline">Logout</button>
+            </form>
+          <%} else {%>
+            <form class="form-inline" style="margin-left: 600px" method="POST" action="/login">
+              <!-- data in the input field will be available to us in the req.body.longURL variable stored in urlDatabase -->
+              <input type="text" name="username" placeholder="Username" style="width: 300px; margin: 1em; border-radius: 5px; border-width: 1px">
+              <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+          <%}%>
         </div>
       </div>
     </nav>
