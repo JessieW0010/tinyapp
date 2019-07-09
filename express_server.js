@@ -50,6 +50,13 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${genshortURL}`);
 });
 
+app.post("/urls/:shortURL/delete", (req, res) => {
+  let short = req.params.shortURL;
+  console.log(short);
+  delete urlDatabase[short];
+  res.redirect("/urls");
+})
+
 //redirect to longURL link:
 app.get("/u/:shortURL", function(req, res) {
   let shortURL = req.params.shortURL;
