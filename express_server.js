@@ -50,10 +50,21 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${genshortURL}`);
 });
 
+app.post("/urls/:shortURL", (req, res) => {
+  const short = req.params.shortURL;
+  res.redirect(`/urls/${short}`);
+});
+
 app.post("/urls/:shortURL/delete", (req, res) => {
   let short = req.params.shortURL;
   console.log(short);
   delete urlDatabase[short];
+  res.redirect("/urls");
+})
+
+app.post("/urls/:shortURL/edit", (req, res) => {
+  let short = req.params.shortURL;
+  urlDatabase[short] = req.body.longURL;
   res.redirect("/urls");
 })
 
