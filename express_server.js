@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();  //initialize express
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const bcrypt = require("bcrypt");
 
 //set cookies
 app.use(cookieParser());
@@ -121,8 +122,10 @@ app.post("/urls/:shortURL", (req, res) => {
 app.post("/login", function(req, res) {
   // if email and password are valid, set the cookie's user_id 
   // console.log(req.cookies);
-  let userID = checkPassword(req.body.loginemail, req.body.loginpassword);
-  if (userID) {
+  let userID = checkUserEmail(req.body.loginemail);
+  let passwordCheck = checkPassword(req.body.loginemail, req.body.loginpassword);
+
+  if (userID && passwordCheck) {
     res.cookie(`user_id`, userID);
   } else {
     res.status(403).send(`Error 403 - Email/ Password entered is not valid!`);
@@ -148,9 +151,10 @@ app.post("/register", function(req, res) {
     users[userID] = {
       id: userID, 
       email: req.body.email, 
-      password: req.body.password
+      password: bcrypt.hashSync(req.body.password, 8)
     }
   }
+  console.log(users);
   res.redirect("/urls");
 })
 
@@ -180,7 +184,7 @@ function generateRandomString() {
 function checkUserEmail(email) {
   for (let user in users) {
     if (users[user].email === email) {
-      return true;
+      return users[user].id;
     }
   }
   return false;
@@ -189,8 +193,8 @@ function checkUserEmail(email) {
 //check password
 function checkPassword(email, password) {
   for (let user in users) {
-    if (users[user].email === email && users[user].password === password) {
-      return users[user].id;
+    if (users[user].email === email) {
+      return bcrypt.compareSync(password, users[user].password);
     }
   }
 }
@@ -204,4 +208,4 @@ function isUsersLink(object, id) {
     }
   }
   return returned;
-}
+  }
