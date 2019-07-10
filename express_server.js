@@ -1,11 +1,15 @@
 const express = require("express");
 const app = express();  //initialize express
 const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
+const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
 
 //set cookies
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session', 
+  keys:["poop"],
+  maxAge: 24 * 60 * 60 * 1000 
+}));
 
 //set bodyParser (this needs to come before all our GET routes)
 app.use(bodyParser.urlencoded({extended: true}));
@@ -37,7 +41,7 @@ const users = {
 
 //urls page containing the long URLs users have input 
 app.get("/urls", function(req, res) {
-  let cookie = req.cookies;
+  let cookie = req.session;
   // console.log(isUsersLink(urlDatabase, cookie.user_id));
   let templateVars = {urls: isUsersLink(urlDatabase, cookie.user_id), user: users[cookie.user_id]};
   res.render("urls_index", templateVars);
@@ -45,7 +49,7 @@ app.get("/urls", function(req, res) {
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   let short = req.params.shortURL;
-  let cookie = req.cookies;
+  let cookie = req.session;
   let userLinks = isUsersLink(urlDatabase, cookie.user_id);
   // if we don't add this, anyone can delete a shortURL from their terminal using curl
   if (userLinks[short]) {
@@ -57,7 +61,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 })
 
 app.get("/urls/new", function(req, res) {
-  let cookie = req.cookies;
+  let cookie = req.session;
   //check if user is logged in
   if (cookie.user_id) {
     res.render("urls_new", {user: users[cookie.user_id]});
@@ -67,18 +71,18 @@ app.get("/urls/new", function(req, res) {
 })
 
 app.get("/login", (req, res) => {
-  let cookie = req.cookies;
+  let cookie = req.session;
   res.render("login", {user: users[cookie.user_id]});
 })
 
 app.get("/register", (req, res) => {
-  let cookie = req.cookies;
+  let cookie = req.session;
   res.render("register", {user: users[cookie.user_id]});
 })
 
 //place this at the bottom so /urls/new will run:
 app.get("/urls/:shortURL", function(req, res) {
-  let cookie = req.cookies;
+  let cookie = req.session;
   let shortURL = req.params.shortURL;
   let longURL = urlDatabase[req.params.shortURL].longURL;
   res.render("urls_show", {longURL: longURL, shortURL: shortURL, user: users[cookie.user_id]});
@@ -86,7 +90,7 @@ app.get("/urls/:shortURL", function(req, res) {
 
 //create short url after inputting long url
 app.post("/urls", (req, res) => {
-  let cookie = req.cookies;
+  let cookie = req.session;
   // console.log(req.body);  // Log the POST request body to the console
   // res.send("Ok");         // Respond with 'Ok' (we will replace this)
   const genshortURL = generateRandomString();
@@ -99,7 +103,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:shortURL/edit", (req, res) => {
-  let cookie = req.cookies;
+  let cookie = req.session;
   let short = req.params.shortURL;
   let usersObj = isUsersLink(urlDatabase, cookie.user_id);
   //check if shortURL exists for current user:
@@ -126,7 +130,9 @@ app.post("/login", function(req, res) {
   let passwordCheck = checkPassword(req.body.loginemail, req.body.loginpassword);
 
   if (userID && passwordCheck) {
-    res.cookie(`user_id`, userID);
+    // res.cookie(`user_id`, userID);
+    req.session.user_id = userID;
+    req.session.save();
   } else {
     res.status(403).send(`Error 403 - Email/ Password entered is not valid!`);
   }
@@ -135,7 +141,7 @@ app.post("/login", function(req, res) {
 
 app.post("/logout", function(req, res) {
   // console.log(req.cookies);
-  res.clearCookie("user_id");
+  req.session = null
   res.redirect("/urls");
 })
 
@@ -154,7 +160,7 @@ app.post("/register", function(req, res) {
       password: bcrypt.hashSync(req.body.password, 8)
     }
   }
-  console.log(users);
+  // console.log(users);
   res.redirect("/urls");
 })
 
