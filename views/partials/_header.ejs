@@ -8,19 +8,23 @@
         <div class="navbar-nav">
           <a class="nav-item nav-link" style="padding: 20px;" href="/urls">My URLs</a>
           <a class="nav-item nav-link" style="padding: 20px;" href="/urls/new">Create New URL</a>
-          <% if (username) {%>
-            <form class="form-inline" style="margin-left: 750px" method="POST" action="/logout">
-              <!-- data in the input field will be available to us in the req.body.longURL variable stored in urlDatabase -->
-              <h5 style="position: inline" class="nav-item nav-link inline" href="/urls/new">Logged in as <%=username%></h5>
-              <button type="submit" class="btn btn-primary inline">Logout</button>
-            </form>
-          <%} else {%>
-            <form class="form-inline" style="margin-left: 600px" method="POST" action="/login">
-              <!-- data in the input field will be available to us in the req.body.longURL variable stored in urlDatabase -->
-              <input type="text" name="username" placeholder="Username" style="width: 300px; margin: 1em; border-radius: 5px; border-width: 1px">
-              <button type="submit" class="btn btn-primary">Login</button>
-            </form>
-          <%}%>
+          
+          <div class="form-inline" style="margin-left: 600px"> 
+              <% if (user) {%>
+                <form class="form-inline" method="POST" action="/logout">
+                  <a class="nav-item nav-link inline" style="padding: 20px">Logged in as <%=user.email%></a>
+                  <button type="submit" class="btn btn-primary">Logout</button>
+                </form>
+              <%} else {%>
+                <div style="margin-left: 200px">
+                    <form class="form-inline" method="POST" action="/loginbtn">
+                      <a class="nav-item nav-link" style="padding: 20px;" href="/register">Register</a>
+                      <a class="nav-item nav-link" style="padding: 20px;" href="/login">Login</a>
+                  </form>
+                </div>
+              <%}%>
+          </div>
+
         </div>
       </div>
     </nav>
