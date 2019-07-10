@@ -24,20 +24,20 @@
         </tr>
       </thead>
       <tbody>
-        <% for(let url in urls) { %>
+        <% for(let obj in urls) { %>
           <tr>
             <!--short URL-->
-            <td><%= url %></td>
+            <td><%= obj %></td>
             <!--long URL-->
-            <td><%= urls[url] %></td>
+            <td><%= urls[obj].longURL %></td>
             <!--Edit URL, redirects to url/shortURL-->
-            <form method="POST" action="/urls/<%= url %>">
+            <form method="POST" action="/urls/<%= obj %>">
               <td><button class="btn btn-outline-primary">Edit</button></td></form>
             <!--Delete URL, redirects to updated urls/-->
-            <form method="POST" action="/urls/<%= url %>/delete">
+            <form method="POST" action="/urls/<%= obj %>/delete">
             <td><button class="btn btn-outline-danger">Delete</button></td></form>
           </tr>
-        <% } %>
+        <%} %>
       </tbody>
     </table>
   </main>
