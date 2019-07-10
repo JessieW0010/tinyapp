@@ -46,6 +46,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   let short = req.params.shortURL;
   let cookie = req.cookies;
   let userLinks = isUsersLink(urlDatabase, cookie.user_id);
+  // if we don't add this, anyone can delete a shortURL from their terminal using curl
   if (userLinks[short]) {
     delete urlDatabase[short];
     res.redirect("/urls");
