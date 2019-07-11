@@ -3,12 +3,12 @@ const app = express();  //initialize express
 const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
+const {getUserByEmail, checkPassword, isUsersLink} = require("./helper");
 
 //set cookies
 app.use(cookieSession({
   name: 'session', 
   keys:["poop"],
-  maxAge: 24 * 60 * 60 * 1000 
 }));
 
 //set bodyParser (this needs to come before all our GET routes)
@@ -28,12 +28,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID", 
     email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
+    password: bcrypt.hashSync("purple-monkey-dinosaur", 8)
   },
  "user2RandomID": {
     id: "user2RandomID", 
     email: "user2@example.com", 
-    password: "dishwasher-funk"
+    password: bcrypt.hashSync("dishwasher-funk", 8)
   }
 }
 
@@ -42,7 +42,6 @@ const users = {
 //urls page containing the long URLs users have input 
 app.get("/urls", function(req, res) {
   let cookie = req.session;
-  // console.log(isUsersLink(urlDatabase, cookie.user_id));
   let templateVars = {urls: isUsersLink(urlDatabase, cookie.user_id), user: users[cookie.user_id]};
   res.render("urls_index", templateVars);
 })
@@ -98,7 +97,6 @@ app.post("/urls", (req, res) => {
     longURL: req.body.longURL, 
     userID: cookie.user_id
   };
-  console.log(urlDatabase);
   res.redirect(`/urls/${genshortURL}`);
 });
 
@@ -126,12 +124,14 @@ app.post("/urls/:shortURL", (req, res) => {
 app.post("/login", function(req, res) {
   // if email and password are valid, set the cookie's user_id 
   // console.log(req.cookies);
-  let userID = checkUserEmail(req.body.loginemail);
-  let passwordCheck = checkPassword(req.body.loginemail, req.body.loginpassword);
+  let loginemail = req.body.loginemail;
+  let loginpassword = req.body.loginpassword;
+  let user = getUserByEmail(loginemail, users); //returns entire user object
+  let passwordCheck = checkPassword(loginemail, loginpassword, users);
 
-  if (userID && passwordCheck) {
+  if (user.id && passwordCheck) {
     // res.cookie(`user_id`, userID);
-    req.session.user_id = userID;
+    req.session.user_id = user.id;
     req.session.save();
   } else {
     res.status(403).send(`Error 403 - Email/ Password entered is not valid!`);
@@ -146,11 +146,11 @@ app.post("/logout", function(req, res) {
 })
 
 app.post("/register", function(req, res) {
-  //if email already in use
+  //if email or password input is blank
   if (req.body.email === ""|| req.body.password === "") {
     res.status(400).send(`Error 400 - Email or password needs to be entered!`);
-  //if email or password
-  } else if (checkUserEmail(req.body.email)) {
+  //if email is already in use:
+  } else if (getUserByEmail(req.body.email, users)) {
     res.status(400).send(`Error 400 - That email is already in use!`);
   } else {
     let userID = generateRandomString();
@@ -185,33 +185,3 @@ function generateRandomString() {
   }
   return result;
 }
-
-//returns true if email already exists in database
-function checkUserEmail(email) {
-  for (let user in users) {
-    if (users[user].email === email) {
-      return users[user].id;
-    }
-  }
-  return false;
-}
-
-//check password
-function checkPassword(email, password) {
-  for (let user in users) {
-    if (users[user].email === email) {
-      return bcrypt.compareSync(password, users[user].password);
-    }
-  }
-}
-
-//check if link belongs to user
-function isUsersLink(object, id) {
-  let returned = {};
-  for (let obj in object) {
-    if (object[obj].userID == id) {
-      returned[obj] = object[obj];
-    }
-  }
-  return returned;
-  }
