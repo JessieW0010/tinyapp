@@ -43,7 +43,7 @@
             <form method="POST" action="/urls/<%= obj %>">
               <td><button class="btn btn-outline-primary">Edit</button></td></form>
             <!--Delete URL, redirects to updated urls/-->
-            <form method="POST" action="/urls/<%= obj %>/delete">
+            <form method="POST" action="/urls/<%= obj %>/delete?_method=DELETE">
             <td><button class="btn btn-outline-danger">Delete</button></td></form>
           </tr>
         <%} %>
