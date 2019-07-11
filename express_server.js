@@ -22,8 +22,8 @@ app.set("view engine", "ejs");
 
 //all long urls and their generated short URLs
 const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", date: "10/20/11", numVisits: 3, browser:[], userID: "4LKOsL" },
-  i3BoGr: { longURL: "https://www.google.ca", date: "10/20/11", numVisits: 3, browser:[], userID: "4LKOsL" }
+  b6UTxQ: { longURL: "https://www.tsn.ca", date: "10/20/11", numVisits: [], browser:[], userID: "4LKOsL" },
+  i3BoGr: { longURL: "https://www.google.ca", date: "10/20/11", numVisits: [], browser:[], userID: "4LKOsL" }
 };
 
 //all users (from registration page)
@@ -44,7 +44,7 @@ const users = {
 
 app.get("/", function(req, res) {
   let cookie = req.session;
-  let templateVars = {urls: isUsersLink(urlDatabase, cookie.user_id), user: users[cookie.user_id]};
+  let templateVars = {urls: isUsersLink(urlDatabase, users[cookie.user_id].id), user: users[cookie.user_id]};
   if (cookie.user_id) { //if logged in
     res.render("urls_index", templateVars);
   } else {  //if not logged in
@@ -55,13 +55,22 @@ app.get("/", function(req, res) {
 //urls page containing the long URLs users have input
 app.get("/urls", function(req, res) {
   let cookie = req.session;
-  let templateVars = {urls: isUsersLink(urlDatabase, cookie.user_id), user: users[cookie.user_id]};
   if (cookie.user_id) {
+    let templateVars = {urls: isUsersLink(urlDatabase, users[cookie.user_id].id), user: users[cookie.user_id]};
     res.render("urls_index", templateVars);
   } else {
-    res.render("login", templateVars);
+    res.render("login", {user: users[cookie.user_id]});
   }
 });
+
+app.get("/urls/:shortURL/visits", (req, res) => {
+  let cookie = req.session;
+  let shortURL = req.params.shortURL;
+  let visitorslog = urlDatabase[shortURL].numVisits;
+  let uniqueVisitorsLog = urlDatabase[shortURL].browser;
+  console.log("hey", visitorslog[0].id, uniqueVisitorsLog);
+  res.render("visit", {user: users[cookie.user_id], visitorslog: visitorslog, unique: uniqueVisitorsLog});
+})
 
 app.delete("/urls/:shortURL/delete", (req, res) => {
   let short = req.params.shortURL;
@@ -118,7 +127,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[genshortURL] = {
     longURL: req.body.longURL,
     date: new Date(),
-    numVisited: 0,
+    numVisits: [],
     browser: [],
     userID: cookie.user_id
   };
@@ -191,15 +200,33 @@ app.post("/register", function(req, res) {
 app.get("/u/:shortURL", function(req, res) {
   let shortURL = req.params.shortURL;
   let cookie = req.session;
-  urlDatabase[shortURL].numVisited += 1;
-  //check if this browser has not already accessed this link
+  //if no browser cookie has been set:
   if (!cookie.browser) {
     cookie.browser = generateRandomString();
   }
-  //check if this browser has clicked this link:
-  if (!urlDatabase[shortURL].browser.find((user) => user === cookie.browser)) {
-    urlDatabase[shortURL].browser.push(cookie.browser);
+  //if visitor is a user
+  if (cookie.user_id) {
+    urlDatabase[shortURL].numVisits.push({
+        id: `User: ${users[cookie.user_id].id}`,
+        timeVisited: new Date()
+      });
+  //if not a user (not logged in)
+  } else {
+    req.session.guest_id = generateRandomString();
+    urlDatabase[shortURL].numVisits.push({
+      id: `Guest: ${req.session.guest_id}`,
+      timeVisited: new Date()
+    });
   }
+
+  //check if unique visitor
+  if (!urlDatabase[shortURL].browser.find((user) => user.id === cookie.browser)) {
+    urlDatabase[shortURL].browser.push({
+      id: cookie.browser, 
+      timeVisited: new Date()
+    });
+  }
+  console.log("unique", urlDatabase[shortURL].browser);
   res.redirect(urlDatabase[shortURL].longURL);
 });
 

@@ -23,9 +23,7 @@ function checkPassword(email, password, users) {
 function isUsersLink(object, id) {
   let returned = {};
   for (let obj in object) {
-    console.log("in function", object[obj], "and", id);
     if (object[obj].userID == id) {
-      console.log("i ran");
       returned[obj] = object[obj];
     }
   }

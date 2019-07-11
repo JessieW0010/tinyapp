@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <title>TinyApp</title>
+</head>
+
+<% include partials/_header %>
+
+<body>
+  <main style="margin: 2em;">
+    <h3>Visitors Log</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Visitor ID</th>
+          <th scope="col">Time Visited</th>
+          <th scope="col">Total Visitors</th>
+        </tr>
+        <%for (let visitor of visitorslog) {%>
+        <tr>
+            <!--Visitor ID-->
+            <td><%=visitor.id%></td>
+            <!--Time stamp-->
+            <td><%=visitor.timeVisited%></td>
+            <!--Total visitors -->
+            <td><%=visitorslog.length%></td>
+          </tr>
+        <%}%>        
+      </thead>
+      <tbody>
+          <tr>
+              <th scope="col">Unique Visitor ID</th>
+              <th scope="col">Time Visited</th>
+              <th scope="col">Total Unique Visitors</th>
+            </tr>
+          <%for (let uniquevisitor of unique) {%>
+          <tr>
+              <!--Unique visitor ID-->
+              <td><%=uniquevisitor.id%></td>
+              <!--Time Stamp-->
+              <td><%=uniquevisitor.timeVisited%></td>
+              <!--Total unique visitors-->
+              <td><%=unique.length%></td>
+          </tr>
+          <%}%>
+      </tbody>
+    </table>
+  </main>
+  <!-- Bootstrap JS -->
