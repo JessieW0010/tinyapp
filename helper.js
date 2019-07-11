@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 function getUserByEmail(email, database) {
   for (let user in database) {
     if (database[user].email == email) {
-      return database[user];
+      return database[user].id;
     }
   }
 }
@@ -28,6 +28,16 @@ function isUsersLink(object, id) {
     }
   }
   return returned;
-  }
+}
 
-  module.exports = {getUserByEmail, checkPassword, isUsersLink}
+//function returns a string of 6 alphanumeric characters
+function generateRandomString() {
+  var rString = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  var result = '';
+  for (var i = 0; i < 6; i++) {
+    result += rString[Math.floor(Math.random() * rString.length)]
+  }
+  return result;
+}
+
+module.exports = {getUserByEmail, checkPassword, isUsersLink, generateRandomString}
