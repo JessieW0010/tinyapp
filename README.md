@@ -5,7 +5,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 ## Final Product
 
 ![](#)
-!["User interface for tiny URL generator"](./views/partials/screenshots/tinyURL.jpg)
+!["User interface for tiny URL generator"]("./views/partials/screenshots/tinyURL.jpg")
 
 ## Dependencies
 
